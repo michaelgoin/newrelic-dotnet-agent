@@ -54,9 +54,17 @@ namespace NewRelic.Agent.Core.Transformers.TransactionTransformer
 
             Log.Debug($"In GetErrorTrace(IAttributeValueCollection, ErrorData), stackTrace after calling GetFormattedStackTrace:");
 
-            for (var i = 0; i < stackTrace.Count; i++)
+            if (stackTrace != null)
             {
-                Log.Debug($"stackTrace[{i}] = {stackTrace[i]}");
+                for (var i = 0; i < stackTrace.Count; i++)
+                {
+                    Log.Debug($"stackTrace[{i}] = {stackTrace[i]}");
+                }
+            }
+            else
+            {
+                Log.Debug($"In GetErrorTrace(ImmutableTransaction, IAttributeValueCollection, TransactionMetricName), stackTrace is null.");
+
             }
 
             var timestamp = errorData.NoticedAt;
@@ -92,9 +100,18 @@ namespace NewRelic.Agent.Core.Transformers.TransactionTransformer
             var stackTrace = GetFormattedStackTrace(errorData);
 
             Log.Debug($"In GetErrorTrace(ImmutableTransaction, IAttributeValueCollection, TransactionMetricName), stackTrace after calling GetFormattedStackTrace:");
-            for (var i = 0; i < stackTrace.Count; i++)
+
+            if (stackTrace != null)
             {
-                Log.Debug($"stackTrace[{i}] = {stackTrace[i]}");
+                for (var i = 0; i < stackTrace.Count; i++)
+                {
+                    Log.Debug($"stackTrace[{i}] = {stackTrace[i]}");
+                }
+            }
+            else
+            {
+                Log.Debug($"In GetErrorTrace(ImmutableTransaction, IAttributeValueCollection, TransactionMetricName), stackTrace is null.");
+
             }
 
             var timestamp = errorData.NoticedAt;
