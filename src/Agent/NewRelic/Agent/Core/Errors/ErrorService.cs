@@ -7,6 +7,7 @@ using System.Linq;
 using System.Web;
 using NewRelic.Agent.Configuration;
 using NewRelic.Agent.Helpers;
+using NewRelic.Core.Logging;
 
 namespace NewRelic.Agent.Core.Errors
 {
@@ -126,8 +127,14 @@ namespace NewRelic.Agent.Core.Errors
             var baseExceptionTypeName = GetFriendlyExceptionTypeName(baseException);
             // We want the message from the base exception since that is the real exception.
             // We want to show to the stacktace from the outermost exception since that will provide the most context for the base exception.
+
+            Log.Debug($"In FromExceptionInternal, stackTrace before calling ExceptionFormatter.FormatStackTrace: {exception.StackTrace}");
+
             var stackTrace = ExceptionFormatter.FormatStackTrace(exception, _configurationService.Configuration.StripExceptionMessages);
             var noticedAt = DateTime.UtcNow;
+
+            Log.Debug($"In FromExceptionInternal, stackTrace after calling ExceptionFormatter.FormatStackTrace: {stackTrace}" );
+
 
             var isExpected = IsErrorFromExceptionSpecified(exception, _configurationService.Configuration.ExpectedErrorsConfiguration);
             return new ErrorData(message, baseExceptionTypeName, stackTrace, noticedAt, customAttributes, isExpected);

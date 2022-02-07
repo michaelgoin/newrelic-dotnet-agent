@@ -8,6 +8,7 @@ using NewRelic.Agent.Core.Errors;
 using NewRelic.Agent.Core.Transactions;
 using NewRelic.Agent.Core.Utils;
 using NewRelic.Agent.Core.WireModels;
+using NewRelic.Core.Logging;
 
 namespace NewRelic.Agent.Core.Transformers.TransactionTransformer
 {
@@ -47,7 +48,16 @@ namespace NewRelic.Agent.Core.Transformers.TransactionTransformer
         /// <returns></returns>
         public ErrorTraceWireModel GetErrorTrace(IAttributeValueCollection attribValues, ErrorData errorData)
         {
+            Log.Debug($"In In GetErrorTrace(IAttributeValueCollection, ErrorData), stackTrace from errorData.StackTrace: {errorData.StackTrace}");
+
             var stackTrace = GetFormattedStackTrace(errorData);
+
+            Log.Debug($"In GetErrorTrace(IAttributeValueCollection, ErrorData), stackTrace after calling GetFormattedStackTrace:");
+
+            for (var i = 0; i < stackTrace.Count; i++)
+            {
+                Log.Debug($"stackTrace[{i}] = {stackTrace[i]}");
+            }
 
             var timestamp = errorData.NoticedAt;
             var path = errorData.Path;
@@ -77,7 +87,15 @@ namespace NewRelic.Agent.Core.Transformers.TransactionTransformer
         {
             var errorData = immutableTransaction.TransactionMetadata.ReadOnlyTransactionErrorState.ErrorData;
 
+            Log.Debug($"In In GetErrorTrace(ImmutableTransaction, IAttributeValueCollection, TransactionMetricName), stackTrace from errorData.StackTrace: {errorData.StackTrace}");
+
             var stackTrace = GetFormattedStackTrace(errorData);
+
+            Log.Debug($"In GetErrorTrace(ImmutableTransaction, IAttributeValueCollection, TransactionMetricName), stackTrace after calling GetFormattedStackTrace:");
+            for (var i = 0; i < stackTrace.Count; i++)
+            {
+                Log.Debug($"stackTrace[{i}] = {stackTrace[i]}");
+            }
 
             var timestamp = errorData.NoticedAt;
             var path = transactionMetricName.PrefixedName;
@@ -95,6 +113,8 @@ namespace NewRelic.Agent.Core.Transformers.TransactionTransformer
             {
                 return null;
             }
+
+            Log.Debug($"In GetFormattedStackTrace, _configurationService.Configuration.StackTraceMaximumFrames = {_configurationService.Configuration.StackTraceMaximumFrames}");
 
             var stackTrace = StackTraces.ScrubAndTruncate(errorData.StackTrace, _configurationService.Configuration.StackTraceMaximumFrames);
             return stackTrace;
