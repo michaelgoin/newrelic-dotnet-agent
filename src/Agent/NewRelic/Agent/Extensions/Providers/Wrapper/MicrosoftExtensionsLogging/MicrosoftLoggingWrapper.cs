@@ -29,8 +29,8 @@ namespace NewRelic.Providers.Wrapper.MicrosoftExtensionsLogging
 
             var renderedMessage = formattedLogValues.ToString();
             var xapi = agent.GetExperimentalApi();
-            xapi.RecordLogMessage(DateTime.UtcNow, logLevel.ToString(), renderedMessage, agent.TraceMetadata.SpanId, agent.TraceMetadata.TraceId);
 
+            xapi.RecordLogMessage("Microsoft.Logging.Extensions", DateTime.UtcNow, logLevel.ToString(), renderedMessage, agent.TraceMetadata.SpanId, agent.TraceMetadata.TraceId);
 
             if (!agent.Configuration.LogDecoratorEnabled)
             {
