@@ -1780,11 +1780,20 @@ namespace NewRelic.Agent.Core.Configuration
 
         #region Log Events and Metrics
 
+        public virtual bool ApplicationLoggingEnabled
+        {
+            get
+            {
+                return EnvironmentOverrides(_localConfiguration.applicationLogging.enabled, "NEW_RELIC_APPLICATION_LOGGING_ENABLED");
+            }
+        }
+
         public virtual bool LogMetricsCollectorEnabled
         {
             get
             { 
-                return EnvironmentOverrides(_localConfiguration.logSending.metrics.enabled, "NEW_RELIC_LOG_SENDING_METRICS_ENABLED");
+                return ApplicationLoggingEnabled &&
+                    EnvironmentOverrides(_localConfiguration.applicationLogging.metrics.enabled, "NEW_RELIC_APPLICATION_LOGGING_METRICS_ENABLED");
             }
         }
 
@@ -1792,7 +1801,10 @@ namespace NewRelic.Agent.Core.Configuration
         {
             get
             {
-                return EnvironmentOverrides(_localConfiguration.logSending.forwarding.enabled, "NEW_RELIC_LOG_SENDING_FORWARDING_ENABLED");
+                return ApplicationLoggingEnabled &&
+                    !SecurityPoliciesTokenExists &&
+                    HighSecurityModeOverrides(false,
+                    EnvironmentOverrides(_localConfiguration.applicationLogging.forwarding.enabled, "NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED"));
             }
         }
 
@@ -1808,8 +1820,9 @@ namespace NewRelic.Agent.Core.Configuration
         {
             get
             {
-                return EnvironmentOverrides(_localConfiguration.logSending.forwarding.maxSamplesStored, "NEW_RELIC_LOG_SENDING_MAX_SAMPLES_STORED")
-                    ?? _localConfiguration.logSending.forwarding.maxSamplesStored;
+                return (int)EnvironmentOverrides(
+                    ServerOverrides(_serverConfiguration.EventHarvestConfig?.LogEventHarvestLimit(), _localConfiguration.applicationLogging.forwarding.maxSamplesStored),
+                    "NEW_RELIC_APPLICATION_LOGGING_FORWARDING_MAX_SAMPLES_STORED");
             }
         }
 
@@ -1817,7 +1830,8 @@ namespace NewRelic.Agent.Core.Configuration
         {
             get
             {
-                return EnvironmentOverrides(_localConfiguration.logSending.decorating.enabled, "NEW_RELIC_LOG_SENDING_DECORATING_ENABLED");
+                return ApplicationLoggingEnabled &&
+                    EnvironmentOverrides(_localConfiguration.applicationLogging.localDecorating.enabled, "NEW_RELIC_APPLICATION_LOGGING_LOCAL_DECORATING_ENABLED");
             }
         }
 

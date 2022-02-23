@@ -27,8 +27,6 @@ namespace NewRelic.Agent.Core.Aggregators
     /// </summary>
     public class LogEventAggregator : AbstractAggregator<LogEventWireModel>, ILogEventAggregator
     {
-        private const String EntityType = "SERVICE";
-        private const String PluginType = "nr-dotnet-agent";
         private const double ReservoirReductionSizeMultiplier = 0.5;
 
         private readonly IAgentHealthReporter _agentHealthReporter;
@@ -86,11 +84,8 @@ namespace NewRelic.Agent.Core.Aggregators
                 : _configuration.UtilizationHostName;
 
             var modelsCollection = new LogEventWireModelCollection(
-                _configuration.ApplicationNames.ElementAt(0),
-                EntityType,
                 _configuration.EntityGuid,
                 hostname,
-                PluginType,
                 aggregatedEvents); ;
 
             var responseStatus = DataTransportService.Send(modelsCollection);
@@ -103,8 +98,7 @@ namespace NewRelic.Agent.Core.Aggregators
             // It is *CRITICAL* that this method never do anything more complicated than clearing data and starting and ending subscriptions.
             // If this method ends up trying to send data synchronously (even indirectly via the EventBus or RequestBus) then the user's application will deadlock (!!!).
 
-            // limits are per 60 seconds, so we need to prorate the value to the faster-event-harvest.
-            ResetCollections(Convert.ToInt32(_configuration.LogEventsMaximumPerPeriod / (60 / HarvestCycle.TotalSeconds)));
+            ResetCollections(_configuration.LogEventsMaximumPerPeriod);
         }
 
         #region Private Helpers
@@ -159,8 +153,6 @@ namespace NewRelic.Agent.Core.Aggregators
 
         private void RetainEvents(IEnumerable<LogEventWireModel> logEvents)
         {
-            _agentHealthReporter.ReportLoggingEventsRecollected(logEvents.Count());
-
             logEvents = logEvents.ToList();
 
             foreach (var logEvent in logEvents)

@@ -406,23 +406,20 @@ namespace NewRelic.Agent.Core
             _agentHealthReporter.ReportSupportabilityCountMetric(metricName, count);
         }
 
-        public void RecordLogMessage(DateTime timestamp, string logLevel, string logMessage, string spanId, string traceId)
+        public void RecordLogMessage(string frameworkName, DateTime timestamp, string logLevel, string logMessage, string spanId, string traceId)
         {
-            // IOC container defaults to singleton so this will access the same aggregator
-            if (!_configurationService.Configuration.LogEventCollectorEnabled)
-            {
-                return;
-            }
+            _agentHealthReporter.ReportLogForwardingFramework(frameworkName);
 
-            if (string.IsNullOrWhiteSpace(logMessage))
-            {
-                return;
-            }
-
-            var normalizedLevel = string.IsNullOrWhiteSpace(logLevel) ? "MISSING_LEVEL" : logLevel.ToUpper();
+            var normalizedLevel = string.IsNullOrWhiteSpace(logLevel) ? "UNKNOWN" : logLevel.ToUpper();
             if (_configurationService.Configuration.LogMetricsCollectorEnabled)
             {
                 _agentHealthReporter.IncrementLogLinesCount(normalizedLevel);
+            }
+
+            // IOC container defaults to singleton so this will access the same aggregator
+            if (!_configurationService.Configuration.LogEventCollectorEnabled || string.IsNullOrWhiteSpace(logMessage))
+            {
+                return;
             }
 
             var transaction = _transactionService.GetCurrentInternalTransaction();

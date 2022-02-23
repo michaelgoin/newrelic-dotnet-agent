@@ -3,11 +3,14 @@
 
 using System;
 using NewRelic.Collections;
+using NewRelic.SystemExtensions;
 
 namespace NewRelic.Agent.Core.WireModels
 {
     public class LogEventWireModel : IHasPriority
     {
+        private const uint MaxMessageLengthInBytes = 32 * 1024;
+
         /// <summary>
         /// The UTC timestamp in unix milliseconds. 
         /// </summary>
@@ -52,7 +55,7 @@ namespace NewRelic.Agent.Core.WireModels
         public LogEventWireModel(long unixTimestampMS, string message, string level, string spanId, string traceId)
         {
             TimeStamp = unixTimestampMS;
-            Message = message;
+            Message = message.TruncateUnicodeStringByBytes(MaxMessageLengthInBytes);
             Level = level;
             SpanId = spanId;
             TraceId = traceId;
@@ -61,7 +64,7 @@ namespace NewRelic.Agent.Core.WireModels
         public LogEventWireModel(long unixTimestampMS, string message, string level, string spanId, string traceId, float priority)
         {
             TimeStamp = unixTimestampMS;
-            Message = message;
+            Message = message.TruncateUnicodeStringByBytes(MaxMessageLengthInBytes);
             Level = level;
             SpanId = spanId;
             TraceId = traceId;

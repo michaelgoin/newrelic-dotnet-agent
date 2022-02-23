@@ -52,13 +52,13 @@ namespace NewRelic.Providers.Wrapper.Logging
             var getRenderedMessageFunc = _getRenderedMessage ??= VisibilityBypasser.Instance.GeneratePropertyAccessor<string>(logEvent.GetType(), "RenderedMessage");
             var renderedMessage = getRenderedMessageFunc(logEvent);
 
-            // We can either get this in Local or UTC
-            var getTimestampFunc = _getTimestamp ??= VisibilityBypasser.Instance.GeneratePropertyAccessor<DateTime>(logEvent.GetType(), "TimeStampUtc");
-            var timestamp = getTimestampFunc(logEvent);
+            // Older versions of log4net only allow access to a timestamp in local time
+            var getTimestampFunc = _getTimestamp ??= VisibilityBypasser.Instance.GeneratePropertyAccessor<DateTime>(logEvent.GetType(), "TimeStamp");
+            var timestamp = getTimestampFunc(logEvent).ToUniversalTime();
 
             // This will either add the log message to the transaction or directly to the aggregator
             var xapi = agent.GetExperimentalApi();
-            xapi.RecordLogMessage(timestamp, logLevel, renderedMessage, agent.TraceMetadata.SpanId, agent.TraceMetadata.TraceId);
+            xapi.RecordLogMessage(WrapperName, timestamp, logLevel, renderedMessage, agent.TraceMetadata.SpanId, agent.TraceMetadata.TraceId);
         }
 
         private void DecorateLogMessage(object logEvent, IAgent agent)
@@ -76,12 +76,11 @@ namespace NewRelic.Providers.Wrapper.Logging
                 return;
             }
 
-            // the keys in the metadata match the ones used for decorating
-            var metadata = agent.GetLinkingMetadata();
-            foreach (var entry in metadata)
-            {
-                propertiesDictionary[entry.Key] = entry.Value ?? string.Empty;
-            }
+            // uses the foratted metadata to make a single entry
+            var formattedMetadata = LoggingHelpers.GetFormattedLinkingMetadata(agent);
+
+            // uses underscores to support other frameworks that do not allow hyphens (Serilog)
+            propertiesDictionary["NR_LINKING_METADATA"] = formattedMetadata;
         }
     }
 }
