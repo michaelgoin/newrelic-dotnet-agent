@@ -7,6 +7,7 @@ using NewRelic.Agent.Api.Experimental;
 using NewRelic.Agent.Extensions.Providers.Wrapper;
 using Microsoft.Extensions.Logging;
 using NewRelic.Core;
+using System.Collections.Generic;
 
 namespace NewRelic.Providers.Wrapper.MicrosoftExtensionsLogging
 {
@@ -32,7 +33,30 @@ namespace NewRelic.Providers.Wrapper.MicrosoftExtensionsLogging
 
             xapi.RecordLogMessage("Microsoft.Logging.Extensions", DateTime.UtcNow, logLevel.ToString(), renderedMessage, agent.TraceMetadata.SpanId, agent.TraceMetadata.TraceId);
 
-            return Delegates.NoOp;
+            IDisposable handle = null;
+
+            if (agent.Configuration.LogDecoratorEnabled)
+            {
+                var logger = (ILogger)instrumentedMethodCall.MethodCall.InvocationTarget;
+                var metaData = agent.GetLinkingMetadata();
+
+                if (metaData != null)
+                {
+                    metaData.TryGetValue("entity.guid", out string entityGuid);
+                    metaData.TryGetValue("hostname", out string hostName);
+                    metaData.TryGetValue("trace.id", out string traceId);
+                    metaData.TryGetValue("span.id", out string spanId);
+
+                    var formattedString = $"NR-LINKING|{entityGuid}|{hostName}|{traceId}|{spanId}";
+
+                    handle = logger.BeginScope(new Dictionary<string, string>()
+                        {
+                            {"NR-LINKING", formattedString}
+                        });
+                }
+            }
+
+            return Delegates.GetDelegateFor(onComplete: () => handle?.Dispose());
         }
     }
 }
