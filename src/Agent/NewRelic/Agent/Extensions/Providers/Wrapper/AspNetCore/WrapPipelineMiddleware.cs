@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using NewRelic.Agent.Api;
+using NewRelic.Agent.Extensions.Logging;
 using NewRelic.Agent.Extensions.Providers.Wrapper;
 using System;
 using System.Collections.Generic;
@@ -40,6 +42,7 @@ namespace NewRelic.Providers.Wrapper.AspNetCore
                 _agent.Logger.Log(Agent.Extensions.Logging.Level.Finest, "Skipping instrumenting incoming OPTIONS request.");
 
                 await _next(context);
+
                 return;
             }
 
@@ -72,7 +75,9 @@ namespace NewRelic.Providers.Wrapper.AspNetCore
 
             try
             {
+
                 await _next(context);
+
                 EndTransaction(segment, transaction, context, null);
             }
             catch (Exception ex)
