@@ -32,26 +32,7 @@ namespace NewRelic.Providers.Wrapper.MicrosoftExtensionsLogging
 
             xapi.RecordLogMessage("Microsoft.Logging.Extensions", DateTime.UtcNow, logLevel.ToString(), renderedMessage, agent.TraceMetadata.SpanId, agent.TraceMetadata.TraceId);
 
-            if (!agent.Configuration.LogDecoratorEnabled)
-            {
-                return Delegates.NoOp;
-            }
-
-            var logger = (ILogger)instrumentedMethodCall.MethodCall.InvocationTarget;
-
-            var metadata = agent.GetLinkingMetadata();
-
-            if (metadata == null)
-            {
-                return Delegates.NoOp;
-            }
-
-            var handle = logger.BeginScope(metadata);
-
-            return Delegates.GetDelegateFor(onComplete: () =>
-            {
-                handle.Dispose();
-            });
+            return Delegates.NoOp;
         }
     }
 }
