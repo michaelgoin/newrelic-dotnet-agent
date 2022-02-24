@@ -3,12 +3,10 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.Extensions.Logging;
 using NewRelic.Agent.Api;
 using NewRelic.Agent.Extensions.Providers.Wrapper;
 using NewRelic.Reflection;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NewRelic.Providers.Wrapper.AspNetCore
@@ -17,9 +15,6 @@ namespace NewRelic.Providers.Wrapper.AspNetCore
     {
         private Func<object, ControllerContext> _getControllerContext;
         private Func<object, ControllerContext> GetControllerContext(string typeName) { return _getControllerContext ?? (_getControllerContext = VisibilityBypasser.Instance.GenerateFieldReadAccessor<ControllerContext>("Microsoft.AspNetCore.Mvc.Core", typeName, "_controllerContext")); }
-
-        private Func<object, ILogger> _getLogger;
-        private Func<object, ILogger> GetLogger() { return _getLogger ?? (_getLogger = VisibilityBypasser.Instance.GenerateFieldReadAccessor<ILogger>("Microsoft.AspNetCore.Mvc.Core", "Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker", "_logger")); }
 
         public bool IsTransactionRequired => true;
 
@@ -50,16 +45,7 @@ namespace NewRelic.Providers.Wrapper.AspNetCore
 
             var segment = transaction.StartMethodSegment(instrumentedMethodCall.MethodCall, controllerTypeName, methodName);
 
-            var logger = GetLogger().Invoke(instrumentedMethodCall.MethodCall.InvocationTarget);
-
-            IDisposable handler = agent.Configuration.LogDecoratorEnabled ? InjectMetadata(logger, agent) : null;
-
-            void onComplete(Task task)
-            {
-                handler.Dispose();
-            }
-
-            return Delegates.GetAsyncDelegateFor<Task>(agent, segment, false, onComplete, TaskContinuationOptions.None);
+            return Delegates.GetAsyncDelegateFor<Task>(agent, segment, TaskContinueWithOption.None);
         }
 
         private static string CreateTransactionName(ControllerActionDescriptor actionDescriptor)
@@ -76,31 +62,5 @@ namespace NewRelic.Providers.Wrapper.AspNetCore
 
             return transactionName;
         }
-
-        static IDisposable InjectMetadata(ILogger logger, IAgent agent)
-        {
-            if (logger != null)
-            {
-                var metaData = agent.GetLinkingMetadata();
-
-                if (metaData != null)
-                {
-                    metaData.TryGetValue("entity.guid", out string entityGuid);
-                    metaData.TryGetValue("hostname", out string hostName);
-                    metaData.TryGetValue("trace.id", out string traceId);
-                    metaData.TryGetValue("span.id", out string spanId);
-
-                    var formattedString = $"NR-LINKING|{entityGuid}|{hostName}|{traceId}|{spanId}";
-
-                    return logger.BeginScope(new Dictionary<string, string>()
-                        {
-                            {"NR-LINKING", formattedString}
-                        });
-                }
-            }
-
-            return null;
-        }
-
     }
 }
