@@ -24,7 +24,7 @@ namespace NewRelic.Providers.Wrapper.Logging
 
         public CanWrapResponse CanWrap(InstrumentedMethodInfo methodInfo)
         {
-            if (LogProviders.RegisteredLogProvider[(int)LogProvider.Log4Net])
+            if (!LogProviders.RegisteredLogProvider[(int)LogProvider.Log4Net])
             {
                 return new CanWrapResponse(WrapperName.Equals(methodInfo.RequestedWrapperName));
             }
