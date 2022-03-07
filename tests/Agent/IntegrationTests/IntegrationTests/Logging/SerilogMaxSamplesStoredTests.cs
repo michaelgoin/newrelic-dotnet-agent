@@ -38,7 +38,7 @@ namespace NewRelic.Agent.IntegrationTests.Logging
                     .EnableApplicationLogging()
                     .EnableLogForwarding()
                     .EnableLogMetrics()
-                    .SetLogForwardingMaxSamplesStored(1)
+                    .SetLogForwardingMaxSamplesStored(12) // this is sent back from collector as 1 (60 second base harvest / 5 second faste harvest = 12)
                     .EnableDistributedTrace()
                     .SetLogLevel("debug");
                 }

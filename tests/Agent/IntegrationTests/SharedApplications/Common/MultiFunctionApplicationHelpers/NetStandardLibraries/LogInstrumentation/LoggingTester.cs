@@ -10,7 +10,7 @@ using NewRelic.Api.Agent;
 namespace MultiFunctionApplicationHelpers.NetStandardLibraries.LogInstrumentation
 {
     [Library]
-    public static class LoggingTester
+    public class LoggingTester
     {
         private static ILoggingAdapter _log;
 
@@ -24,6 +24,9 @@ namespace MultiFunctionApplicationHelpers.NetStandardLibraries.LogInstrumentatio
                     break;
                 case "SERILOG":
                     _log = new SerilogLoggingAdapter();
+                    break;
+                case "MICROSOFTLOGGING":
+                    //_log = new MicrosoftLoggingLoggingAdapter();
                     break;
                 default:
                     throw new System.ArgumentNullException(nameof(loggingFramework));
