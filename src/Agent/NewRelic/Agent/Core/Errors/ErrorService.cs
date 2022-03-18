@@ -128,12 +128,12 @@ namespace NewRelic.Agent.Core.Errors
             // We want the message from the base exception since that is the real exception.
             // We want to show to the stacktace from the outermost exception since that will provide the most context for the base exception.
 
-            Log.Debug($"In FromExceptionInternal, stackTrace before calling ExceptionFormatter.FormatStackTrace: {exception.StackTrace}");
+            Log.Info($"ErrorStackTraceDebug: In FromExceptionInternal, stackTrace before calling ExceptionFormatter.FormatStackTrace: {exception.StackTrace}");
 
             var stackTrace = ExceptionFormatter.FormatStackTrace(exception, _configurationService.Configuration.StripExceptionMessages);
             var noticedAt = DateTime.UtcNow;
 
-            Log.Debug($"In FromExceptionInternal, stackTrace after calling ExceptionFormatter.FormatStackTrace: {stackTrace}" );
+            Log.Info($"ErrorStackTraceDebug: In FromExceptionInternal, stackTrace after calling ExceptionFormatter.FormatStackTrace: {stackTrace}" );
 
 
             var isExpected = IsErrorFromExceptionSpecified(exception, _configurationService.Configuration.ExpectedErrorsConfiguration);

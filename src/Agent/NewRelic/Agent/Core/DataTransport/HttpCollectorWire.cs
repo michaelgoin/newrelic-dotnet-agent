@@ -66,7 +66,14 @@ namespace NewRelic.Agent.Core.DataTransport
             {
                 var uri = GetUri(method, connectionInfo);
 
-                Log.DebugFormat("Invoking \"{0}\" with : {1}", method, serializedData);
+                if (method == "error_event_data")
+                {
+                    Log.InfoFormat("ErrorStackTraceDebug: Invoking \"{0}\" with : {1}", method, serializedData);
+                }
+                else
+                {
+                    Log.DebugFormat("Invoking \"{0}\" with : {1}", method, serializedData);
+                }
                 AuditLog(Direction.Sent, Source.InstrumentedApp, uri);
                 AuditLog(Direction.Sent, Source.InstrumentedApp, serializedData);
 

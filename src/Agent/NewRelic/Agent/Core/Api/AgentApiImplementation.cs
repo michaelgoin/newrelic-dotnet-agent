@@ -193,6 +193,7 @@ namespace NewRelic.Agent.Core.Api
 
             using (new IgnoreWork())
             {
+                Log.Info("ErrorStackTraceDebug: NoticeError(Exception exception, IDictionary<string, string>? customAttributes) API called");
                 var transaction = TryGetCurrentInternalTransaction();
                 if (IsCustomExceptionIgnored(exception, transaction)) return;
                 var errorData = _errorService.FromException(exception, customAttributes);
@@ -206,6 +207,7 @@ namespace NewRelic.Agent.Core.Api
 
             using (new IgnoreWork())
             {
+                Log.Info("ErrorStackTraceDebug: NoticeError(Exception exception, IDictionary<string, object>? customAttributes) API called");
                 var transaction = TryGetCurrentInternalTransaction();
                 if (IsCustomExceptionIgnored(exception, transaction)) return;
                 var errorData = _errorService.FromException(exception, customAttributes);
@@ -230,6 +232,7 @@ namespace NewRelic.Agent.Core.Api
 
             using (new IgnoreWork())
             {
+                Log.Info("ErrorStackTraceDebug: NoticeError(Exception exception) API called");
                 var transaction = TryGetCurrentInternalTransaction();
                 if (IsCustomExceptionIgnored(exception, transaction)) return;
                 var errorData = _errorService.FromException(exception);
@@ -261,6 +264,7 @@ namespace NewRelic.Agent.Core.Api
 
             using (new IgnoreWork())
             {
+                Log.Info("ErrorStackTraceDebug: NoticeError(string message, IDictionary<string, string>? customAttributes, bool isExpected) API called");
                 var transaction = TryGetCurrentInternalTransaction();
                 if (IsErrorMessageIgnored(message)) return;
                 var errorData = _errorService.FromMessage(message, customAttributes, isExpected);
@@ -279,6 +283,7 @@ namespace NewRelic.Agent.Core.Api
 
             using (new IgnoreWork())
             {
+                Log.Info("ErrorStackTraceDebug: NoticeError(string message, IDictionary<string, object>? customAttributes, bool isExpected) API called");
                 var transaction = TryGetCurrentInternalTransaction();
                 if (IsErrorMessageIgnored(message)) return;
                 var errorData = _errorService.FromMessage(message, customAttributes, isExpected);
@@ -303,6 +308,7 @@ namespace NewRelic.Agent.Core.Api
         {
             if (_errorService.ShouldIgnoreException(exception))
             {
+                Log.Info("ErrorStackTraceDebug: In IsCustomExceptionIgnored, _errorService.ShouldIgnoreException is true.");
                 if (transaction != null) transaction.TransactionMetadata.TransactionErrorState.SetIgnoreCustomErrors();
                 return true;
             }
