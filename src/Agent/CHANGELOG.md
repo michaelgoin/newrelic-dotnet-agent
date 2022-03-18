@@ -6,12 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] changes
 ### New Features
-* Adds new supportability metrics to track agent endpoint data usage. New metrics will be reported under the `Supportability/DotNET/Collector` namespace. ([#899](https://github.com/newrelic/newrelic-dotnet-agent/pull/899))
 ### Fixes
+
+## [9.6.1] - 2022-03-15
+### Fixes
+* Fixes [application pool allow/deny listing bug](https://github.com/newrelic/newrelic-dotnet-agent/issues/1014) introduced in 9.5.0 ([#1015](https://github.com/newrelic/newrelic-dotnet-agent/pull/1015))
+
+## [9.6.0] - 2022-02-24
+### Fixes
+* Adds new supportability metrics to track agent endpoint data usage. New metrics will be reported under the `Supportability/DotNET/Collector` namespace. ([#899](https://github.com/newrelic/newrelic-dotnet-agent/pull/899))
+* Uses IMDSv2 instead of IMDSv1 to gather utilization details for AWS hosted instances. ([#965](https://github.com/newrelic/newrelic-dotnet-agent/pull/965))
 
 ## [9.5.1] - 2022-02-03
 ### Fixes
-* Fixes [application crashes on Alpine Linux](https://github.com/newrelic/newrelic-dotnet-agent/issues/918) introduced in 9.5.0. ([#929]https://github.com/newrelic/newrelic-dotnet-agent/pull/929)
+* Fixes [application crashes on Alpine Linux](https://github.com/newrelic/newrelic-dotnet-agent/issues/918) introduced in 9.5.0. ([#929](https://github.com/newrelic/newrelic-dotnet-agent/pull/929))
 
 ## [9.5.0] - 2022-02-01
 ### New Features
@@ -200,7 +208,7 @@ We have validated that this version of the agent is compatible with .NET 5 Relea
 
 ### New Features
 * **Proxy Password Obfuscation Support** <br/>
-Agent configuration supports the obfuscation of the proxy password. [The New Relic Command Line Interface (CLI)](https://github.com/newrelic/newrelic-cli/blob/master/README.md) may be used to obscure the proxy password.  The following [documentation](https://docs.newrelic.com/docs/agents/net-agent/configuration/net-agent-configuration#proxy) describes how to use an obscured proxy password in the .NET Agent configuration.
+Agent configuration supports the obfuscation of the proxy password. [The New Relic Command Line Interface (CLI)](https://github.com/newrelic/newrelic-cli/blob/main/README.md) may be used to obscure the proxy password.  The following [documentation](https://docs.newrelic.com/docs/agents/net-agent/configuration/net-agent-configuration#proxy) describes how to use an obscured proxy password in the .NET Agent configuration.
 * **MySqlConnector Support** <br/>
 The MySqlConnector ADO.NET driver is instrumented by default. Fixes [#85](https://github.com/newrelic/newrelic-dotnet-agent/issues/85) and implements [this suggestion](https://discuss.newrelic.com/t/feature-idea-support-mysqlconnector-driver-for-db-instrumentation/63414).
 
@@ -376,7 +384,9 @@ Fixes issue where updating custom instrumentation while application is running c
 ### Fixes
 * New Relic distributed tracing relies on propagating trace and span identifiers in the headers of external calls (e.g., an HTTP call). These identifiers now only contain lowercase alphanumeric characters. Previous versions of the .NET agent used uppercase alphanumeric characters. The usage of uppercase alphanumeric characters can break traces when calling downstream services also monitored by a New Relic agent that supports W3C trace context (New Relic's .NET agent does not currently support W3C trace context. Support for W3C trace context for .NET will be in an upcoming release). This is only a problem if a .NET application is the originator of the trace.
 
-[Unreleased]: https://github.com/newrelic/newrelic-dotnet-agent/compare/v9.5.1...HEAD
+[Unreleased]: https://github.com/newrelic/newrelic-dotnet-agent/compare/v9.6.1...HEAD
+[9.6.1]: https://github.com/newrelic/newrelic-dotnet-agent/compare/v9.6.0...v9.6.1
+[9.6.0]: https://github.com/newrelic/newrelic-dotnet-agent/compare/v9.5.1...v9.6.0
 [9.5.1]: https://github.com/newrelic/newrelic-dotnet-agent/compare/v9.5.0...v9.5.1
 [9.5.0]: https://github.com/newrelic/newrelic-dotnet-agent/compare/v9.4.0...v9.5.0
 [9.4.0]: https://github.com/newrelic/newrelic-dotnet-agent/compare/v9.3.0...v9.4.0
