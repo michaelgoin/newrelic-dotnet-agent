@@ -47,10 +47,14 @@ namespace NewRelic.Agent.Core.DistributedTracing
 
             if (traceparent == null)
             {
+                Log.Debug("traceparent object is null - not succesful.");
                 errors.Add(IngestErrorType.TraceParentParseException);
             }
-
-            Log.Debug("traceparent object successfully created: '" + traceparent.ToString() + "'");
+            else
+            {
+                Log.Debug("traceparent object successfully created: '" + traceparent.ToString() + "'");
+            }
+            
             return traceparent;
         }
 

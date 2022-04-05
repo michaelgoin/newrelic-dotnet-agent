@@ -236,11 +236,11 @@ namespace NewRelic.Agent.Core.DistributedTracing
                 tracingState._traceContext.TraceparentPresent &&
                 !errors.Contains(IngestErrorType.TraceParentParseException) ? true : false;
 
-            Log.Debug("W3CTraceContext was accepted.");
+            Log.Debug("W3CTraceContext was accepted: "+ tracingState.TraceContextWasAccepted.ToString() + ".");
 
             tracingState._validTracestateWasAccepted = tracingState._traceContext?.Tracestate?.AccountKey != null ? true : false;
 
-            Log.Debug("TraceState was valid and accepted.");
+            Log.Debug("TraceState was valid and accepted: " + tracingState._validTracestateWasAccepted.ToString() + ".");
 
             // newrelic 
             // if traceparent was present (regardless if valid), ignore newrelic header
