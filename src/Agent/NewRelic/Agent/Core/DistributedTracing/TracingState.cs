@@ -4,6 +4,7 @@
 using NewRelic.Agent.Extensions.Providers.Wrapper;
 using NewRelic.Core;
 using NewRelic.Core.DistributedTracing;
+using NewRelic.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -235,13 +236,17 @@ namespace NewRelic.Agent.Core.DistributedTracing
                 tracingState._traceContext.TraceparentPresent &&
                 !errors.Contains(IngestErrorType.TraceParentParseException) ? true : false;
 
+            Log.Debug("W3CTraceContext was accepted.");
+
             tracingState._validTracestateWasAccepted = tracingState._traceContext?.Tracestate?.AccountKey != null ? true : false;
 
+            Log.Debug("TraceState was valid and accepted.");
 
             // newrelic 
             // if traceparent was present (regardless if valid), ignore newrelic header
             if (!tracingState._traceContext.TraceparentPresent)
             {
+                Log.Debug("Entered newrelic DT section - should not be here with W3C unless it was bad.");
                 var newRelicHeaderList = getter(carrier, Constants.DistributedTracePayloadKey);
                 if (newRelicHeaderList?.Count() > 0) // the Newrelic header key was present
                 {
@@ -257,6 +262,7 @@ namespace NewRelic.Agent.Core.DistributedTracing
 
             // if Traceparent was present (regardless if valid), generate TransactionAttributes
             tracingState.HasDataForAttributes = tracingState._traceContext.TraceparentPresent == true || tracingState.NewRelicPayloadWasAccepted == true;
+            Log.Debug("tracingState.HasDataForAttributes was '" + tracingState.HasDataForAttributes.ToString() + "'.");
 
             tracingState._transactionStartTime = tracingState._validTracestateWasAccepted || tracingState.NewRelicPayloadWasAccepted ? transactionStartTime : default;
             tracingState.TransportType = transportType;

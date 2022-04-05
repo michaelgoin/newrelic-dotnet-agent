@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using NewRelic.Core.DistributedTracing;
+using NewRelic.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,7 @@ namespace NewRelic.Agent.Core.DistributedTracing
             }
 
             TraceparentPresent = true;
+            Log.Debug("traceparent found: '" + result.FirstOrDefault() + "'.");
 
             var traceparent = W3CTraceparent.GetW3CTraceParentFromHeader(result.First());
 
@@ -48,6 +50,7 @@ namespace NewRelic.Agent.Core.DistributedTracing
                 errors.Add(IngestErrorType.TraceParentParseException);
             }
 
+            Log.Debug("traceparent object successfully created: '" + traceparent.ToString() + "'");
             return traceparent;
         }
 
@@ -60,6 +63,7 @@ namespace NewRelic.Agent.Core.DistributedTracing
                 return null;
             }
 
+            Log.Debug("tracestate found.");
             var tracestate = W3CTracestate.GetW3CTracestateFromHeaders(result, trustedAccountKey);
 
             if (tracestate.Error != IngestErrorType.None)
@@ -67,6 +71,7 @@ namespace NewRelic.Agent.Core.DistributedTracing
                 errors.Add(tracestate.Error);
             }
 
+            Log.Debug("tracestate object successfully created: '" + tracestate.ToString() + "'");
             return tracestate;
         }
     }

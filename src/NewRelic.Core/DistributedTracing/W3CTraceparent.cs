@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using NewRelic.Core.Logging;
 
 namespace NewRelic.Core.DistributedTracing
 {
@@ -78,24 +79,28 @@ namespace NewRelic.Core.DistributedTracing
         {
             if (string.IsNullOrEmpty(traceparentValue) || traceparentValue.Length < TraceparentLengthV0)
             {
+                Log.Debug("traceparentValue was null, empty, or less than '" + TraceparentLengthV0 + "' characters.");
                 return null;
             }
 
             var traceparentData = traceparentValue.Split(_separator);
             if (traceparentData.Length < NumberOfFieldsV0)
             {
+                Log.Debug("traceparentData.Length is less than '" + NumberOfFieldsV0 + "'.");
                 return null;
             }
 
             // Attempt to get the version prior to checking number of fields to ensure we do the right thing
             if (!TryParseVersion(traceparentData[VersionIndex], out var parsedVersion))
             {
+                Log.Debug("TryParseVersion returned false.");
                 return null;
             }
 
             if (parsedVersion == SupportedVersion &&
                 traceparentData.Length != NumberOfFieldsV0)
             {
+                Log.Debug("traceparentData.Length does not equal'" + NumberOfFieldsV0 + "' in supported version.");
                 return null;
             }
 
@@ -103,6 +108,7 @@ namespace NewRelic.Core.DistributedTracing
                 || !ValidateParentId(traceparentData[ParentIdIndex])
                 || !ValidateTraceFlags(traceparentData[TraceFlagsIndex]))
             {
+                Log.Debug("traceparentData was not valid for either traceId, parentId, or traceflags.");
                 return null;
             }
 
@@ -127,6 +133,7 @@ namespace NewRelic.Core.DistributedTracing
                 || !_hexRegex.IsMatch(version))
             {
                 parsedVersion = InvalidVersion255; // 255 is invalid, avoiding using a nullable here
+                Log.Debug("parsedVersion was invalid due to length or invalid characters.");
                 return false;
             }
 
@@ -136,10 +143,12 @@ namespace NewRelic.Core.DistributedTracing
                 out var v))
             {
                 parsedVersion = v;
+                Log.Debug("parsedVersion is '" + parsedVersion + "', returning true.");
                 return true;
             }
 
             parsedVersion = InvalidVersion255; // 255 is invalid, avoiding using a nullable here
+            Log.Debug("parsedVersion was invalid due to something.");
             return false;
         }
 
@@ -149,6 +158,7 @@ namespace NewRelic.Core.DistributedTracing
                 || traceId == ZerodOutTraceId
                 || !_hexRegex.IsMatch(traceId))
             {
+                Log.Debug("traceId was not valid due to being incorrect length ('" + traceId.Length + "' not '" + TraceIdLengthV0 + "'), zeroed out, or bad characters.");
                 return false;
             }
 
@@ -161,6 +171,7 @@ namespace NewRelic.Core.DistributedTracing
                 || parentId == ZerodOutParentId
                 || !_hexRegex.IsMatch(parentId))
             {
+                Log.Debug("parentId was not valid due to being incorrect length ('" + parentId.Length + "' not '" + ParentIdLengthV0 + "'), zeroed out, or bad characters.");
                 return false;
             }
 
@@ -171,6 +182,7 @@ namespace NewRelic.Core.DistributedTracing
         {
             if (traceFlags.Length != TraceFlagsLengthV0 || !_hexRegex.IsMatch(traceFlags))
             {
+                Log.Debug("traceFlags was not valid due to being incorrect length ('" + traceFlags.Length + "' not '" + TraceFlagsLengthV0 + "') or bad characters.");
                 return false;
             }
 

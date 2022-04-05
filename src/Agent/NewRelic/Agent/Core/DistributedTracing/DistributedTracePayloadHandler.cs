@@ -270,6 +270,8 @@ namespace NewRelic.Agent.Core.DistributedTracing
 
         public ITracingState AcceptDistributedTraceHeaders<T>(T carrier, Func<T, string, IEnumerable<string>> getter, TransportType transportType, DateTime transactionStartTime)
         {
+            Log.Debug("DistributedTracePayloadHandler.AcceptDistributedTraceHeaders called.");
+
             if (getter == null)
             {
                 Log.Debug("getHeaders argument is null.");
@@ -284,6 +286,8 @@ namespace NewRelic.Agent.Core.DistributedTracing
                 {
                     ReportIncomingErrors(tracingState.IngestErrors);
                 }
+
+                Log.Debug("tracingState is not null.");
 
                 if (_configurationService.Configuration.PayloadSuccessMetricsEnabled)
                 {

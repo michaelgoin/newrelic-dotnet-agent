@@ -604,6 +604,7 @@ namespace NewRelic.Agent.Core.Transactions
                 var normalizedTransportType = isUnknownTransportType ? TransportType.Unknown : transportType;
 
                 TracingState = _distributedTracePayloadHandler.AcceptDistributedTraceHeaders(carrier, getter, normalizedTransportType, StartTime);
+                Log.Debug("TracingState was set.");
             }
             else
             {
