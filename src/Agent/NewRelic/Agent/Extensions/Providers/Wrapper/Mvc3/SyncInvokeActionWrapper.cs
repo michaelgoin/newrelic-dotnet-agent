@@ -33,6 +33,11 @@ namespace NewRelic.Providers.Wrapper.Mvc3
 
                 var segment = transaction.StartMethodSegment(instrumentedMethodCall.MethodCall, controllerName, actionName);
 
+                // TODO: don't grab these directly
+                var segmentApi = segment.GetExperimentalApi();
+                segmentApi.UserCodeNamespace = controllerContext.Controller.GetType().FullName;
+                segmentApi.UserCodeFunction = actionName;
+
                 if (segment != null)
                 {
                     return Delegates.GetDelegateFor(segment);

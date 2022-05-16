@@ -5,6 +5,7 @@ using System;
 using NewRelic.Agent.Api;
 using NewRelic.Agent.Extensions.Providers.Wrapper;
 using NewRelic.SystemExtensions;
+using NewRelic.Agent.Api.Experimental;
 
 namespace NewRelic.Providers.Wrapper.Mvc3
 {
@@ -39,7 +40,13 @@ namespace NewRelic.Providers.Wrapper.Mvc3
                 var transactionName = string.Format("{0}/{1}", controllerName, actionName);
                 transaction.SetWebTransactionName(WebTransactionType.MVC, transactionName, TransactionNamePriority.FrameworkLow);
 
-                var segment = transaction.StartMethodSegment(instrumentedMethodCall.MethodCall, controllerName, actionName);
+                // For some reason the extension method isn't appling unless explicitly use ISegment
+                ISegment segment = transaction.StartMethodSegment(instrumentedMethodCall.MethodCall, controllerName, actionName);
+
+                // TODO: don't grab these directly
+                var segmentApi = segment.GetExperimentalApi();
+                segmentApi.UserCodeNamespace = controllerContext.Controller.GetType().FullName;
+                segmentApi.UserCodeFunction = actionName;
 
                 httpContext.Items[HttpContextSegmentKey] = segment;
             }

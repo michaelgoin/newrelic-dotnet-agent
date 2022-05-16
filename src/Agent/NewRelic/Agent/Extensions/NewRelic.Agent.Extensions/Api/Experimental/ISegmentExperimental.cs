@@ -30,5 +30,9 @@ namespace NewRelic.Agent.Api.Experimental
         /// <returns>The segment that the segmentData was added to.</returns>
         ISegmentExperimental MakeLeaf();
 
+
+        string UserCodeFunction { get; set; }
+        string UserCodeNamespace { get; set; }
+
     }
 }
